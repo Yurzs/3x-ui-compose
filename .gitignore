@@ -1,0 +1,9 @@
+/cert/
+/crts/
+/db/
+/letsencrypt/
+
+.idea
+.venv
+__pycache__
+
