@@ -3,7 +3,7 @@
 name: 3x
 
 x-common-env: &common-env
-  DOMAIN: ${DOMAIN:?DOMAIN is required}
+  DOMAIN: ${3XUI_DOMAIN:?Domain name is required}
 
 services:
   3x-ui:
