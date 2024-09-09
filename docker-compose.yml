@@ -1,0 +1,50 @@
+# syntax=docker/docker-compose:2.0.0
+---
+name: 3x
+
+x-common-env: &common-env
+  DOMAIN: ${DOMAIN:?DOMAIN is required}
+
+services:
+  3x-ui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-ui
+    hostname: ${DOMAIN}
+    volumes:
+      - $PWD/db/:/etc/x-ui/
+      - $PWD/cert/:/root/cert/
+      - /etc/letsencrypt:/etc/letsencrypt
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+    network_mode: host
+    tty: true
+    restart: unless-stopped
+
+  haproxy:
+    image: haproxy:latest
+    hostname: ${DOMAIN}
+    container_name: ${COMPOSE_PROJECT_NAME}-haproxy
+    restart: on-failure
+    user: root
+    depends_on:
+      - certbot
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - $PWD/letsencrypt:/etc/letsencrypt
+      - $PWD/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - $PWD/crts:/usr/local/etc/haproxy/crts/
+
+  certbot:
+    container_name: ${COMPOSE_PROJECT_NAME}-certbot
+    hostname: ${DOMAIN}
+    image: ghcr.io/yurzs/certbot:haproxy
+    pull_policy: always
+    volumes:
+      - $PWD/letsencrypt:/etc/letsencrypt
+      - /etc/letsencrypt/renewal-hooks/post/
+      - $PWD/crts:/usr/local/etc/haproxy/crts/
+    environment:
+      <<: *common-env
+    command: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
