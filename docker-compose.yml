@@ -31,6 +31,9 @@ services:
     ports:
       - "443:443"
       - "80:80"
+    environment:
+      <<: *common-env
+      UI_PORT: 2053
     volumes:
       - $PWD/letsencrypt:/etc/letsencrypt
       - $PWD/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
