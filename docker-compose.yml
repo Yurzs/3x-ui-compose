@@ -9,7 +9,7 @@ services:
   3x-ui:
     image: ghcr.io/mhsanaei/3x-ui:latest
     container_name: ${COMPOSE_PROJECT_NAME}-ui
-    hostname: ${DOMAIN}
+    hostname: ${XUI_DOMAIN}
     volumes:
       - $PWD/db/:/etc/x-ui/
       - $PWD/cert/:/root/cert/
@@ -22,7 +22,7 @@ services:
 
   haproxy:
     image: haproxy:latest
-    hostname: ${DOMAIN}
+    hostname: ${XUI_DOMAIN}
     container_name: ${COMPOSE_PROJECT_NAME}-haproxy
     restart: on-failure
     user: root
@@ -41,7 +41,7 @@ services:
 
   certbot:
     container_name: ${COMPOSE_PROJECT_NAME}-certbot
-    hostname: ${DOMAIN}
+    hostname: ${XUI_DOMAIN}
     image: ghcr.io/yurzs/certbot:haproxy
     pull_policy: always
     volumes:
